@@ -6,12 +6,13 @@ RED = "#e7305b"
 GREEN = "#9bdeac"
 YELLOW = "#ffffb3"
 FONT_NAME = "Courier"
-WORK_MIN = 25
-SHORT_BREAK_MIN = 5
-LONG_BREAK_MIN = 30
+work_min = 25
+short_break_min = 5
+long_break_min = 30
 reps = 0
 check_marks = ""
 timer = None
+times = 0
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 
@@ -29,13 +30,43 @@ def reset_timer():
 
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
+    
+def save_time():
+    global times
+    global work_min
+    global short_break_min
+    global long_break_min
+
+    timer_input_value = time_input.get()
+    time_input.delete(0, "end")
+    
+
+    if times == 0:
+        work_min = int(timer_input_value)
+        minute_label.config(text="short break")
+    elif times == 1:
+        short_break_min = int(timer_input_value)
+        minute_label.config(text="long break")
+    elif times == 2:
+        long_break_min = int(timer_input_value)
+        time_input.destroy()
+        minute_label.destroy()
+        enter_btn.destroy()
+
+    times +=1
+
 
 def start_timer():
     global reps
+    global work_min
+    global short_break_min
+    global long_break_min
+
+    work_secs = work_min * 60
+    short_break_secs = short_break_min * 60
+    long_break_secs = long_break_min * 60
+
     reps += 1
-    work_secs = WORK_MIN * 60
-    short_break_secs = SHORT_BREAK_MIN * 60
-    long_break_secs = LONG_BREAK_MIN * 60
 
     if reps % 2 == 1:
         count_down(work_secs)
@@ -84,11 +115,8 @@ window.config(bg=YELLOW)
 window.minsize(width = 500, height = 400)
 
 
-
-
-
 canvas = Canvas(width = 200, height = 224, bg=YELLOW, highlightthickness=0)
-tomato_img = PhotoImage(file="tomato.png")
+tomato_img = PhotoImage(file="pomodoro/tomato.png")
 canvas.create_image(100, 112, image = tomato_img)
 timer_text = canvas.create_text(103, 130, text="00:00", font = (FONT_NAME, 35, "bold"))
 canvas.grid(column=1, row = 1)
@@ -107,6 +135,13 @@ reset_btn.grid(column = 2, row = 2)
 check_mark_text = Label(text="", font = (FONT_NAME, 25, "bold"), fg=GREEN, bg = YELLOW)
 check_mark_text.grid(column = 1, row = 3)
 
+time_input = Entry(width=10)
+time_input.grid(column=0, row=0)
 
+minute_label = Label(text = "work minutes", font=(FONT_NAME, 14, "bold"), fg=GREEN, bg=YELLOW)
+minute_label.place(x=0, y=40)
+
+enter_btn = Button(text="Enter", highlightbackground = YELLOW, command=save_time)
+enter_btn.place(x = 0, y= 60)
 
 window.mainloop()
